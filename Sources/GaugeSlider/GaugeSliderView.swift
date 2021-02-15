@@ -23,6 +23,25 @@ public enum GaugeSliderDelegationMode: Equatable {
 @IBDesignable
 public class GaugeSliderView: UIView {
     
+    func colorWithGradient(colors: [UIColor]) -> UIColor {
+        
+        // create the background layer that will hold the gradient
+        let backgroundGradientLayer = CAGradientLayer()
+        backgroundGradientLayer.frame = frame
+         
+        // we create an array of CG colors from out UIColor array
+        let cgColors = colors.map({$0.cgColor})
+        
+        backgroundGradientLayer.colors = cgColors
+        
+        UIGraphicsBeginImageContext(backgroundGradientLayer.bounds.size)
+        backgroundGradientLayer.render(in: UIGraphicsGetCurrentContext()!)
+        let backgroundColorImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return UIColor(patternImage: backgroundColorImage!)
+    }
+    
     //  MARK: - Static variables -
     
     private static let minValue: CGFloat = -1.20
@@ -49,7 +68,7 @@ public class GaugeSliderView: UIView {
      * Sets filled sliding path color
      */
     @IBInspectable
-    open var fillPathColor = UIColor.green {
+    open var fillPathColor = UIColor(red: 0.27, green: 0.33, blue: 0.64, alpha: 1.00) {
         didSet {
             setNeedsDisplay()
         }
@@ -182,7 +201,7 @@ public class GaugeSliderView: UIView {
      * Sets maximum slider value
      */
     @IBInspectable
-    open var maxValue: CGFloat = 25 {
+    open var maxValue: CGFloat = 125 {
         didSet {
             updateViews()
         }
@@ -242,7 +261,7 @@ public class GaugeSliderView: UIView {
      * Sets placeholder font
      */
     @IBInspectable
-    open var placeholderFont = UIFont.systemFont(ofSize: 17, weight: .medium) {
+    open var placeholderFont = UIFont.systemFont(ofSize: 24, weight: .medium) {
         didSet {
             placeholderLabel.font = placeholderFont
         }
@@ -320,19 +339,20 @@ public class GaugeSliderView: UIView {
         super.draw(rect)
         drawPath(in: rect, color: blankPathColor, thickness: 1.5, trackWidth: trackWidth, capturePoints: true)
         
-        drawMeter(in: rect, color: blankPathColor, startAngle: .pi * GaugeSliderView.minValue - 0.02, endAngle: -.pi - 0.04)
-        drawMeter(in: rect, color: blankPathColor, startAngle: -.pi + 0.05, endAngle: .pi * GaugeSliderView.midValue - 0.05)
-        drawMeter(in: rect, color: blankPathColor, startAngle: .pi * GaugeSliderView.midValue + 0.04, endAngle: 0 - 0.04)
-        drawMeter(in: rect, color: blankPathColor, startAngle: 0.06, endAngle: .pi * GaugeSliderView.maxValue + 0.03)
+        drawMeter(in: rect, color: UIColor(red: 1.00, green: 0.40, blue: 0.40, alpha: 1.00)
+, startAngle: .pi * GaugeSliderView.minValue - 0.02, endAngle: -.pi + 0.4)
+        drawMeter(in: rect, color: UIColor(red: 1.00, green: 0.82, blue: 0.40, alpha: 1.00), startAngle: -.pi + 0.41,  endAngle: 0 - 0.4)
+        drawMeter(in: rect, color: UIColor(red: 0.33, green: 0.73, blue: 0.28, alpha: 1.00)
+, startAngle: -0.39, endAngle: .pi * GaugeSliderView.maxValue + 0.03)
         
-        drawMeterIndicator(in: rect, color: blankPathColor, angle: -.pi)
-        drawMeterIndicator(in: rect, color: blankPathColor, angle: -.pi / 2)
-        drawMeterIndicator(in: rect, color: blankPathColor, angle: 0)
+//        drawMeterIndicator(in: rect, color: blankPathColor, angle: -.pi)
+//        drawMeterIndicator(in: rect, color: blankPathColor, angle: -.pi / 2)
+//        drawMeterIndicator(in: rect, color: blankPathColor, angle: 0)
         
         let range = GaugeSliderView.maxValue + abs(GaugeSliderView.minValue)
         let currentValue = GaugeSliderView.minValue + range * progress / 100
         
-        drawPath(in: rect, color: fillPathColor, thickness: 2.5, trackWidth: trackWidth, endValue: currentValue)
+        drawPath(in: rect, color: UIColor(red: 0.27, green: 0.33, blue: 0.64, alpha: 1.00), thickness: 2.5, trackWidth: trackWidth, endValue: currentValue)
         drawPath(in: rect, color: indicatorColor, thickness: 2.5, trackWidth: trackWidth * 1.6, startValue: currentValue - 0.01, endValue: currentValue, drawShadow: true)
     }
     
@@ -370,11 +390,11 @@ public class GaugeSliderView: UIView {
         rightIconView.contentMode = .scaleAspectFit
         addSubview(rightIconView)
         
-        customControlButton.backgroundColor = customControlColor.withAlphaComponent(0.1)
-        customControlButton.setTitleColor(customControlColor, for: .normal)
-        customControlButton.layer.cornerRadius = 16
-        customControlButton.addTarget(self, action: #selector(onCustomButton), for: .touchUpInside)
-        addSubview(customControlButton)
+//        customControlButton.backgroundColor = customControlColor.withAlphaComponent(0.1)
+//        customControlButton.setTitleColor(customControlColor, for: .normal)
+//        customControlButton.layer.cornerRadius = 16
+//        customControlButton.addTarget(self, action: #selector(onCustomButton), for: .touchUpInside)
+//        addSubview(customControlButton)
         
         updateViews()
     }
@@ -506,7 +526,7 @@ public class GaugeSliderView: UIView {
         )
         
         color.setStroke()
-        path.lineWidth = 4
+        path.lineWidth = 15
         
         context?.saveGState()
         context?.setLineDash(phase: 0, lengths: [1, 8])
